@@ -73,4 +73,5 @@ def process_md_file(file):
   test_targets(metadata, defns)
 
 process_md_file("conversions.md")
+process_md_file("fresh.md")
 proj.main()
