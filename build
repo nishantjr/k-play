@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+
+import os
+import subprocess
+import sys
+import yaml
+
+# Bootstrapping
+# =============
+
+# Make sure the KNinja repo is available.
+#
+subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
+extdir = 'ext'
+sys.path.append(os.path.join(os.path.dirname(__file__), extdir))
+
+from kninja import *
+
+# Build
+# =====
+
+proj = KProject(extdir = extdir)
+
+def parse_metadata(source):
+    metadata = None
+    with open(source, 'r') as stream:
+      try:
+        metadata = next(yaml.safe_load_all(stream))
+      except yaml.YAMLError as exc:
+        print(exc)
+    metadata['source'] = source
+    return metadata
+
+def kompile_targets(metadata):
+  defns = []
+  for backend in metadata['backends']:
+    flags = ''
+    if backend == 'llvm':
+        flags = '-ccopt -Wl,-z,notext'
+    defns += [ proj.definition( alias = metadata['alias'] + '-' + backend
+                              , backend = backend
+                              , main = metadata['source']
+                              , runner_script = '/dev/null'
+                              , flags = flags
+                              )
+             ]
+  return defns
+
+def test_targets(metadata, definitions):
+  source = metadata['source']
+  tests = { 'java': [], 'llvm': [], 'ocaml': [], 'haskell': []}
+  for test in metadata['tests']:
+    input_file = proj.place_in_output_dir(source + test['selector'])
+    input_selector = test['selector'] + '.input'
+    input = proj.tangle(source, output = input_file,  selector = input_selector)
+    expected_file = proj.place_in_output_dir(source + test['selector'] + '.expected')
+    expected_selector = test['selector'] + '.expected'
+    expected = proj.tangle(source, output = expected_file,  selector = expected_selector)
+    for defn in definitions:
+      tests[defn._backend] += \
+        [ input.then(defn.krun().variable('flags', '--debug')) \
+              .then(proj.check(expected = expected).variable('flags', '--ignore-all-space --ignore-blank-lines')) \
+              .default()
+        ]
+  all_tests = []
+  for defn in definitions:
+    all_tests += [proj.alias(metadata['alias'] + '-' + defn._backend + '-tests', tests[defn._backend])]
+  proj.alias(metadata['alias'] + '-tests', all_tests)
+
+def process_md_file(file):
+  metadata = parse_metadata(file)
+  defns = kompile_targets(metadata)
+  test_targets(metadata, defns)
+
+process_md_file("conversions.md")
+proj.main()
