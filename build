@@ -31,13 +31,13 @@ def parse_metadata(source):
     metadata['source'] = source
     return metadata
 
-def kompile_targets(metadata):
+def kompile_targets(alias, metadata):
   defns = []
   for backend in metadata['backends']:
     flags = ''
     if backend == 'llvm':
         flags = '-ccopt -Wl,-z,notext'
-    defns += [ proj.definition( alias = metadata['alias'] + '-' + backend
+    defns += [ proj.definition( alias = alias + '-' + backend
                               , backend = backend
                               , main = metadata['source']
                               , runner_script = '/dev/null'
@@ -46,7 +46,7 @@ def kompile_targets(metadata):
              ]
   return defns
 
-def test_targets(metadata, definitions):
+def test_targets(alias, metadata, definitions):
   source = metadata['source']
   tests = { 'java': [], 'llvm': [], 'ocaml': [], 'haskell': []}
   for test in metadata['tests']:
@@ -64,13 +64,14 @@ def test_targets(metadata, definitions):
         ]
   all_tests = []
   for defn in definitions:
-    all_tests += [proj.alias(metadata['alias'] + '-' + defn._backend + '-tests', tests[defn._backend])]
-  proj.alias(metadata['alias'] + '-tests', all_tests)
+    all_tests += [proj.alias(alias + '-' + defn._backend + '-tests', tests[defn._backend])]
+  proj.alias(alias + '-tests', all_tests)
 
 def process_md_file(file):
+  alias = os.path.splitext(file)[0]
   metadata = parse_metadata(file)
-  defns = kompile_targets(metadata)
-  test_targets(metadata, defns)
+  defns = kompile_targets(alias, metadata)
+  test_targets(alias, metadata, defns)
 
 process_md_file("conversions.md")
 process_md_file("fresh.md")

@@ -1,5 +1,4 @@
 ---
-alias: tokens-and-parsing
 backends:
   - java
   - haskell

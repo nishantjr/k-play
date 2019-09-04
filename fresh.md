@@ -1,5 +1,4 @@
 ---
-alias: fresh
 backends:
   - ocaml
 #  - java
