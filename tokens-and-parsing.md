@@ -1,6 +1,6 @@
 ---
 backends:
-  - java
+#  - java # Fails because of different output (`SetItem()` around cells)
   - haskell
   - ocaml
   - llvm
@@ -39,22 +39,27 @@ We also need to make sorts with more specific tokens subsorts of ones with more
 general tokens. We add the token attribute to this production so that all tokens
 of a particular sort are marked with the sort it is parsed as, and not a subsort
 thereof. e.g. we get `underbar(#token("foo", "NameWithUnderbar"))` instead of
-`underbar(#token("foo", "LowerName"))`
+`underbar(#token("foo", "#LowerId"))`
 
 ```k
 module TOKENS-AND-PARSING
   imports BOOL
+```
 
-  syntax UpperName ::= r"[A-Z][A-Za-z0-9]*" [prec(10), token]
-  syntax LowerName ::= r"[a-z][A-Za-z0-9]*" [prec(10), token]
+The `BUILTIN-ID-TOKENS` module defines `#UpperId` and `#LowerId` with attributes `prec(2)`
 
-  syntax NameWithUnderbar ::= r"[a-zA-Z][A-Za-z0-9_]*" [prec(9), token]
-                            | UpperName                [token]
-                            | LowerName                [token]
+```k
+  imports BUILTIN-ID-TOKENS
+```
 
-  syntax NameWithSharp ::= r"[a-zA-Z][A-Za-z0-9_#]*" [prec(9), token]
-                         | UpperName                 [token]
-                         | LowerName                 [token]
+```k
+  syntax NameWithUnderbar ::= r"[a-zA-Z][A-Za-z0-9_]*" [prec(1), token]
+                            | #UpperId                [token]
+                            | #LowerId                [token]
+
+  syntax NameWithSharp ::= r"[a-zA-Z][A-Za-z0-9_#]*" [prec(1), token]
+                         | #UpperId                 [token]
+                         | #LowerId                 [token]
 
   syntax Pgm ::= underbar(NameWithUnderbar)
                | sharp(NameWithSharp)
