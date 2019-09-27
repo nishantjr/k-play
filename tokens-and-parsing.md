@@ -41,6 +41,12 @@ of a particular sort are marked with the sort it is parsed as, and not a subsort
 thereof. e.g. we get `underbar(#token("foo", "NameWithUnderbar"))` instead of
 `underbar(#token("foo", "#LowerId"))`
 
+*TODO:* `#UpperId` and `#LowerId` have `prec(2)` while `KLabel` and `#KVariable`
+have `prec(1)`. That does not leave much room for other priorities. Even if
+`KLabel`, `#KVariable` aren't a problem, since we can't have negative
+precedences, only `prec(0)` and `prec(1)` are available to users. Perhaps we
+should multiply these by 100?
+
 ```k
 module TOKENS-AND-PARSING
   imports BOOL
