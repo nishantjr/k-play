@@ -73,7 +73,6 @@ def process_md_file(file):
   defns = kompile_targets(alias, metadata)
   test_targets(alias, metadata, defns)
 
-process_md_file("conversions.md")
-process_md_file("fresh.md")
-process_md_file("tokens-and-parsing.md")
+list(map(process_md_file, list(filter(lambda x: not x in ['README.md', 'pending-documentation.md'],  glob('*.md')))))
+
 proj.main()
