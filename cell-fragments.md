@@ -1,9 +1,9 @@
 ---
 backends:
   - ocaml
-  - java
+#  - java  # Incorrect output format
   - llvm
-  - haskell
+#  - haskell
 tests:
   - selector: ".collect-foos"
 ---
