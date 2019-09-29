@@ -4,18 +4,22 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>layout</title>
+  <title>Custom comments</title>
   <style>
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
       span.underline{text-decoration: underline;}
       div.column{display: inline-block; vertical-align: top; width: 50%;}
   </style>
+  <link rel="stylesheet" href="/site.css" />
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
 </head>
 <body>
+<header id="title-block-header">
+<h1 class="title">Custom comments</h1>
+</header>
 <p>Productions for the <code>#Layout</code> sort are used to describe tokens that are considered “whitespace”. For example, below, we use it to define lines begining with <code>;</code> (semicolon) as comments.</p>
 <pre class="k"><code>module LAYOUT
   syntax #Layout ::= r&quot;(;[^\\n\\r]*)&quot;
