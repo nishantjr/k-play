@@ -67,11 +67,20 @@ def test_targets(alias, metadata, definitions):
     all_tests += [proj.alias(alias + '-' + defn._backend + '-tests', tests[defn._backend])]
   proj.alias(alias + '-tests', all_tests)
 
+generate_html = \
+proj.rule( 'generate-html'
+         , description = 'generate-html: $in -> $out'
+         , command = 'pandoc -t html "$in" -o "$out" -s'
+         )
+def html_target(file):
+  proj.source(file).then(generate_html.output(proj.builddir('site', replace_extension(file, 'html'))))
+
 def process_md_file(file):
   alias = os.path.splitext(file)[0]
   metadata = parse_metadata(file)
   defns = kompile_targets(alias, metadata)
   test_targets(alias, metadata, defns)
+  html_target(file)
 
 list(map(process_md_file, glob('docs/*.md')))
 
