@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>cell-fragments</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<p>K allows matching fragments of the configuration and using them to construct terms and use as function parameters.</p>
+<pre class="k"><code>module CELL-FRAGMENTS
+    imports BOOL
+    imports SET
+    imports INT</code></pre>
+<p>This configuration contains a <code>&lt;foo&gt;</code> cell with multiplicity <code>*</code>.</p>
+<pre class="k"><code>    syntax KItem ::= &quot;#init&quot;
+    configuration &lt;t&gt;
+                    &lt;k&gt; #init ~&gt; #collectOddFoos ~&gt; $PGM &lt;/k&gt;
+                    &lt;foos&gt;
+                      &lt;foo multiplicity=&quot;*&quot; type=&quot;Set&quot;&gt; 1 &lt;/foo&gt;
+                    &lt;/foos&gt;
+                  &lt;/t&gt;</code></pre>
+<p>The <code>#collectOddFoos</code> construct grabs the entire content of the <code>&lt;foos&gt;</code> cell. We may also match on only a portion of its content. Note that the fragment must be wrapped in a <code>&lt;foo&gt;</code> cell at the call site.</p>
+<pre class="k"><code>    syntax KItem ::= &quot;#collectOddFoos&quot;
+    rule &lt;k&gt; #collectOddFoos =&gt; collectOddFoos(&lt;foos&gt; FOOS &lt;/foos&gt;) ... &lt;/k&gt;
+         &lt;foos&gt; FOOS &lt;/foos&gt;</code></pre>
+<p>Next the <code>collectOddFoos</code> function collects the items it needs</p>
+<pre class="k"><code>    syntax Set ::= collectOddFoos(FoosCell) [function]
+    rule collectOddFoos(&lt;foos&gt; &lt;foo&gt; I &lt;/foo&gt; REST &lt;/foos&gt;)
+      =&gt; SetItem(I) collectOddFoos(&lt;foos&gt; REST &lt;/foos&gt;)
+      requires I %Int 2 ==Int 1
+    rule collectOddFoos(&lt;foos&gt; &lt;foo&gt; I &lt;/foo&gt; REST &lt;/foos&gt;)
+      =&gt; collectOddFoos(&lt;foos&gt; REST &lt;/foos&gt;)
+      requires I %Int 2 ==Int 0
+    rule collectOddFoos(&lt;foos&gt; .Bag &lt;/foos&gt;) =&gt; .Set</code></pre>
+<pre class="k"><code>    rule &lt;t&gt;
+           &lt;k&gt; #init =&gt; .K ... &lt;/k&gt;
+           &lt;foos&gt; _
+               =&gt; &lt;foo&gt; 3 &lt;/foo&gt;
+                  &lt;foo&gt; 6 &lt;/foo&gt;
+                  &lt;foo&gt; 9 &lt;/foo&gt;
+                  &lt;foo&gt; 7 &lt;/foo&gt;
+           &lt;/foos&gt;
+         &lt;/t&gt;</code></pre>
+<pre class="k"><code>endmodule</code></pre>
+<pre class="collect-foos input"><code>1</code></pre>
+<pre class="collect-foos expected"><code>&lt;t&gt;
+  &lt;k&gt;
+    SetItem ( 3 )
+    SetItem ( 7 )
+    SetItem ( 9 ) ~&gt; 1
+  &lt;/k&gt;
+  &lt;foos&gt;
+    &lt;foo&gt;
+      3
+    &lt;/foo&gt; &lt;foo&gt;
+      6
+    &lt;/foo&gt; &lt;foo&gt;
+      7
+    &lt;/foo&gt; &lt;foo&gt;
+      9
+    &lt;/foo&gt;
+  &lt;/foos&gt;
+&lt;/t&gt;</code></pre>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>tokens-and-parsing</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<p>Consider the following naive attempt at creating a language whos syntax allows two types of variables: Names that contain underbars, and names that contain sharps/hashes/pound-signs:</p>
+<pre class="k"><code>module TOKENS-AND-PARSING-NAIVE
+  syntax NameWithUnderbar ::= r&quot;[a-zA-Z][A-Za-z0-9_]*&quot;  [token]
+  syntax NameWithSharp    ::= r&quot;[a-zA-Z][A-Za-z0-9_#]*&quot; [token]
+  syntax Pgm ::= underbar(NameWithUnderbar)
+               | sharp(NameWithSharp)
+endmodule</code></pre>
+<p>Although, it seems that K has enough information to parse the programs <code>underbar(foo)</code> and <code>sharp(foo)</code> with, the lexer does not take into account whether a token is being parsed for the <code>sharp</code> or for the <code>underbar</code> production. It chooses an arbitary sort for the token <code>foo</code> (perhaps <code>NameWithUnderbar</code>). Thus, during paring it is unable to construct a valid term for one of those programs (<code>sharp(foo)</code>) and produces the error message: <code>Inner Parser: Parse error: unexpected token 'foo'.</code></p>
+<p>Since calculating inclusions and intersections between regular expressions is difficult, we must provide this information to K. We do this via the <code>prec(N)</code> attribute that specifies the order in which the lexer tries tokens. Token productions with higher precedence are tried first.</p>
+<p>We also need to make sorts with more specific tokens subsorts of ones with more general tokens. We add the token attribute to this production so that all tokens of a particular sort are marked with the sort it is parsed as, and not a subsort thereof. e.g. we get <code>underbar(#token("foo", "NameWithUnderbar"))</code> instead of <code>underbar(#token("foo", "#LowerId"))</code></p>
+<p><em>TODO:</em> <code>#UpperId</code> and <code>#LowerId</code> have <code>prec(2)</code> while <code>KLabel</code> and <code>#KVariable</code> have <code>prec(1)</code>. That does not leave much room for other priorities. Even if <code>KLabel</code>, <code>#KVariable</code> aren’t a problem, since we can’t have negative precedences, only <code>prec(0)</code> and <code>prec(1)</code> are available to users. Perhaps we should multiply these by 100?</p>
+<pre class="k"><code>module TOKENS-AND-PARSING
+  imports BOOL</code></pre>
+<p>The <code>BUILTIN-ID-TOKENS</code> module defines <code>#UpperId</code> and <code>#LowerId</code> with attributes <code>prec(2)</code></p>
+<pre class="k"><code>  imports BUILTIN-ID-TOKENS</code></pre>
+<pre class="k"><code>  syntax NameWithUnderbar ::= r&quot;[a-zA-Z][A-Za-z0-9_]*&quot; [prec(1), token]
+                            | #UpperId                [token]
+                            | #LowerId                [token]
+
+  syntax NameWithSharp ::= r&quot;[a-zA-Z][A-Za-z0-9_#]*&quot; [prec(1), token]
+                         | #UpperId                 [token]
+                         | #LowerId                 [token]
+
+  syntax Pgm ::= underbar(NameWithUnderbar)
+               | sharp(NameWithSharp)
+endmodule </code></pre>
+<pre class="amb-underbar input"><code>underbar(foo)</code></pre>
+<pre class="amb-underbar expected"><code>&lt;k&gt;
+  underbar ( foo )
+&lt;/k&gt;</code></pre>
+<pre class="amb-sharp input"><code>sharp(foo)</code></pre>
+<pre class="amb-sharp expected"><code>&lt;k&gt;
+  sharp ( foo )
+&lt;/k&gt;</code></pre>
+</body>
+</html>

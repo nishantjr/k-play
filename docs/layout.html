@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>layout</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<p>Productions for the <code>#Layout</code> sort are used to describe tokens that are considered “whitespace”. For example, below, we use it to define lines begining with <code>;</code> (semicolon) as comments.</p>
+<pre class="k"><code>module LAYOUT
+  syntax #Layout ::= r&quot;(;[^\\n\\r]*)&quot;
+                   | r&quot;([\\ \\n\\r\\t])&quot; // Whitespace
+                   
+  syntax KItem ::= &quot;foo&quot;
+endmodule</code></pre>
+<pre class="semicolon-comments input"><code>foo ; buzz
+; bar</code></pre>
+<pre class="semicolon-comments expected"><code>&lt;k&gt;
+  foo
+&lt;/k&gt;</code></pre>
+</body>
+</html>

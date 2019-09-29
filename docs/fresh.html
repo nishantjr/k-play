@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Fresh Constants</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Fresh Constants</h1>
+</header>
+<p>This module demonstrates how to use the <code>!</code> operator generate a fresh instance of a given sort.</p>
+<pre class="k"><code>module FRESH
+  imports INT
+  imports STRING
+  syntax Foo ::= r&quot;[a-z][A-Za-z\\-0-9&#39;\\#\\_]*&quot; [token, autoReject]</code></pre>
+<p>The hook <code>STRING.string2token</code> allows conversion of any string to a token:</p>
+<pre class="k"><code>  syntax Foo ::= String2Foo(String) [function, functional, hook(STRING.string2token)]</code></pre>
+<p>A construct tagged with <code>freshGenerator</code> will create a fresh instance when using the <code>!</code> operator. In this case, a fresh instance of sort <code>Foo</code> will prepend “fresh_” to an integer, for which it keeps a running count.</p>
+<pre class="k"><code>  syntax Foo ::= freshFoo(Int) [freshGenerator, function, functional]
+  rule freshFoo(I:Int) =&gt; String2Foo(&quot;fresh_&quot; +String Int2String(I))</code></pre>
+<p><code>getNewFoo</code> calls <code>!</code> operator which calls the above function to create a fresh instance.</p>
+<pre class="k"><code>  syntax Foo ::= &quot;getFreshFoo&quot;
+  rule getFreshFoo =&gt; !F1:Foo ~&gt; !F2:Foo</code></pre>
+<pre class="k"><code>endmodule</code></pre>
+<pre class="fresh-foo input"><code>getFreshFoo</code></pre>
+<pre class="fresh-foo expected"><code>&lt;k&gt;
+  fresh_1 ~&gt; fresh_0
+&lt;/k&gt;</code></pre>
+</body>
+</html>

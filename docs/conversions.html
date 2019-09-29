@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>conversions</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<p>You can convert between tokens of one sort via <code>String</code>s by defining functions that are implemented by builtin hooks.</p>
+<pre class="k"><code>module CONVERSIONS
+  imports STRING
+  syntax Foo ::= &quot;foo&quot; [token]
+  syntax Bar ::= &quot;bar&quot; [token]</code></pre>
+<p>The hook <code>STRING.token2string</code> allows conversion of any token to a string:</p>
+<pre class="k"><code>  syntax String ::= FooToString(Foo)  [function, functional, hook(STRING.token2string)]</code></pre>
+<pre class="foo-to-string input"><code>FooToString(foo)</code></pre>
+<pre class="foo-to-string expected"><code>&lt;k&gt;
+  &quot;foo&quot;
+&lt;/k&gt;</code></pre>
+<p>Similarly, the hook <code>STRING.string2Token</code> implements the inverse:</p>
+<pre class="k"><code>  syntax Bar ::= StringToBar(String) [function, functional, hook(STRING.string2token)]</code></pre>
+<pre class="string-to-bar input"><code>StringToBar(&quot;bar&quot;)</code></pre>
+<pre class="string-to-bar expected"><code>&lt;k&gt;
+  bar
+&lt;/k&gt;</code></pre>
+<p>WARNING: This sort of conversion does <em>NOT</em> do any sort of parsing or validation. Thus, we can create arbitary tokens of any sort:</p>
+<pre class="random-string-to-bar input"><code>StringToBar(&quot;The sun rises in the west.&quot;)</code></pre>
+<pre class="random-string-to-bar expected"><code>&lt;k&gt;
+  The sun rises in the west.
+&lt;/k&gt;</code></pre>
+<p>Composing these two functions lets us convert from <code>Foo</code> to <code>Bar</code></p>
+<pre class="k"><code>  syntax Bar ::= FooToBar(Foo) [function]
+  rule FooToBar(F) =&gt; StringToBar(FooToString(F))</code></pre>
+<pre class="foo-to-bar input"><code>FooToBar(foo)</code></pre>
+<pre class="foo-to-bar expected"><code>&lt;k&gt;
+  foo
+&lt;/k&gt;</code></pre>
+<pre class="k"><code>endmodule</code></pre>
+</body>
+</html>
