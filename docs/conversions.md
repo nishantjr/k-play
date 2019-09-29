@@ -1,5 +1,5 @@
 ---
-alias: conversions
+title: Token Conversions
 backends:
   - ocaml
 #  - java
