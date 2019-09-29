@@ -1,0 +1,24 @@
+
+.k::before {
+    content: "K Code" ;
+    color: green ;
+    display: block
+}
+
+.input::before {
+    content: "Test" ;
+    color: green ;
+    display: block
+}
+
+.expected::before {
+    content: "Expected output" ;
+    color: green ;
+    display: block
+}
+
+html {
+    margin:    0 auto;
+    max-width: 40em;
+}
+
