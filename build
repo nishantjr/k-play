@@ -73,6 +73,6 @@ def process_md_file(file):
   defns = kompile_targets(alias, metadata)
   test_targets(alias, metadata, defns)
 
-list(map(process_md_file, list(filter(lambda x: not x in ['README.md', 'pending-documentation.md'],  glob('*.md')))))
+list(map(process_md_file, list(filter(lambda x: not x in ['README.md', 'pending-documentation.md', './unorganized.md'],  glob('*.md')))))
 
 proj.main()
