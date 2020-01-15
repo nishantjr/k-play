@@ -1,5 +1,4 @@
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
 
 ## Part 1: Defining LAMBDA
 
@@ -19,6 +18,195 @@ learn the following:
 * How to include builtins (integers and Booleans) into your language.
 * How to define derived language constructs.
 
+
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_1/README.md <==
+
+### Syntax Modules and Basic K Commands
+
+[MOVIE [4'07"]](http://youtu.be/y5Tf1EZVj8E)
+
+Here we define our first K module, which contains the initial syntax of the
+LAMBDA language, and learn how to use the basic K commands.
+
+Let us create an empty working folder, and open a terminal window
+(to the left) and an editor window (to the right).  We will edit our K
+definition in the right window in a file called `lambda.k`, and will call
+the K tool commands in the left window.
+
+Let us start by defining a K module, containing the syntax of LAMBDA.
+
+K modules are introduced with the keywords `module` ... `endmodule`.
+
+The keyword `syntax` adds new productions to the syntax grammar, using a
+BNF-like notation.
+
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_2/README.md <==
+
+### Module Importing, Rules, Variables
+
+[MOVIE [4'03"]](http://youtu.be/NDXgYfHG6R4)
+
+We here learn how to include a predefined module (SUBSTITUTION), how to
+use it to define a K rule (the characteristic rule of lambda calculus),
+and how to make proper use of variables in rules.
+
+Let us continue our `lambda.k` definition started in the previous lesson.
+
+The `requires` keyword takes a `.k` file containing language features that
+are needed for the current definition, which can be found in the
+[k/include](/include/) folder.  Thus, the command
+
+    require "substitution.k"
+
+says that the subsequent definition of LAMBDA needs the generic substitution,
+which is predefined in file `substitution.k` under the folder
+
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_3/README.md <==
+
+### Evaluation Strategies using Strictness
+
+[MOVIE [2'20"]](http://youtu.be/aul1x6bd1YM)
+
+Here we learn how to use the K `strict` attribute to define desired evaluation
+strategies.  We will also learn how to tell K which terms are already
+evaluated, so it does not attempt to evaluate them anymore and treats them
+internally as results of computations.
+
+Recall from the previous lecture that the LAMBDA program
+`free-variable-capture.lambda` was stuck, because K was not given permission
+to evaluate the arguments of the lambda application construct.
+
+You can use the attribute `strict` to tell K that the corresponding construct
+has a strict evaluation strategy, that is, that its arguments need to be
+evaluated before the semantics of the construct applies.  The order of
+argument evaluation is purposely unspecified when using `strict`, and indeed
+the K tool allows us to detect all possible non-deterministic behaviors that
+
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_4/README.md <==
+
+### Generating Documentation; Latex Attributes
+
+[MOVIE [3'13"]](http://youtu.be/ULXA4e_6-DY)
+
+In this lesson we learn how to generate formatted documentation from K
+language definitions.  We also learn how to use Latex attributes to control
+the formatting of language constructs, particularly of ones which have a
+mathematical flavor and we want to display accordingly.
+
+To generate PDF documentation, all we have to do is to call the `kdoc` command
+in the folder where the kompiled definition is.  This command generates a
+`lambda.pdf` file, which contains the formatted K definition.
+
+Open this file using your favorite PDF reader.  The syntactic details are not
+shown in the generated PDF, because we typically want to focus on semantics at
+this stage.  The main notational difference between the original `.k` and the
+generated PDF is how rules are displayed.  In the PDF, the rule `left => right`
+is replaced by its representation in K (see papers on K), which is harder to
+
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_5/README.md <==
+
+### Adding Builtins; Side Conditions
+
+[MOVIE [4'52"]](http://youtu.be/T1aI04q3l9U)
+
+We have already added the builtin identifiers (sort `Id`) to LAMBDA expressions,
+but those had no operations on them.  In this lesson we add integers and
+Booleans to LAMBDA, and extend the builtin operations on them into
+corresponding operations on LAMBDA expressions.  We will also learn how to add
+side conditions to rules, to limit the number of instances where they can
+apply.
+
+The K tool provides several builtins, which are automatically included in all
+definitions.  These can be used in the languages that we define, typically by
+including them in the desired syntactic categories.  You can also define your
+own builtins in case the provided ones are not suitable for your language
+(e.g., the provided builtin integers and operations on them are arbitrary
+precision).
+
+
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_6/README.md <==
+
+### Selective Strictness; Anonymous Variables
+
+[MOVIE [2'14"]](http://youtu.be/IreP6DFPWdk)
+
+We here show how to define selective strictness of language constructs,
+that is, how to state that certain language constructs are strict only
+in some arguments.  We also show how to use anonymous variables.
+
+We next define a conditional `if` construct, which takes three arguments,
+evaluates only the first one, and then reduces to either the second or the
+third, depending on whether the first one evaluated to true or to false.
+
+K allows to define selective strictness using the same `strict` attribute,
+but passing it a list of numbers.  The numbers correspond to the arguments
+in which we want the defined construct to be strict.  In our case,
+
+    syntax Exp ::= "if" Exp "then" Exp "else" Exp   [strict(1)]
+
+
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_7/README.md <==
+
+### Derived Constructs, Extending Predefined Syntax
+
+[MOVIE [5'10"]](http://youtu.be/qZWiBaN7zrw)
+
+In this lesson we will learn how to define derived language constructs, that
+is, ones whose semantics is defined completely in terms of other language
+constructs.  We will also learn how to add new constructs to predefined
+syntactic categories.
+
+When defining a language, we often want certain language constructs to be
+defined in terms of other constructs.  For example, a let-binding construct
+of the form
+
+    let x = e in e'
+
+is nothing but syntactic sugar for
+
+    (lambda x . e') e
+
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_8/README.md <==
+
+### Multiple Binding Constructs
+
+[MOVIE [2'40"]](http://youtu.be/Ox4uXDpcY64)
+
+Here we learn how multiple language constructs that bind variables can
+coexist. We will also learn about or recall another famous binder besides
+`lambda`, namely `mu`, which can be used to elegantly define all kinds of
+interesting fixed-point constructs.
+
+The `mu` binder has the same syntax as lambda, except that it replaces
+`lambda` with `mu`.
+
+Since `mu` is a binder, in order for substitution to know how to deal with
+variable capture in the presence of `mu`, we have to tell it that `mu` is a
+binding construct, same like lambda.  We take advantage of being there and
+also add `mu` its desired latex attribute.
+
+The intuition for
+
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_9/README.md <==
+
+### A Complete and Documented K Definition
+
+[MOVIE [6'07"]](http://youtu.be/-pHgLqNMKac)
+
+In this lesson you will learn how to add formal comments to your K definition,
+in order to nicely document it.  The generated document can be then used for
+various purposes: to ease understanding the K definition, to publish it,
+to send it to others, etc.
+
+The K tool allows a literate programming style, where the executable
+language definition can be documented by means of annotations.  Some
+back-ends of the K tool, such as those enabled with the `--latex`, `--pdf` and
+the `--html` options to the `kompile` tool, know how to interpret such
+annotations.
+
+There are three types of comments, which we discuss next.
+
+#### Ordinary comments
 
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/2_imp/README.md <==
 <!-- Copyright (c) 2010-2019 K Team. All Rights Reserved. -->
@@ -41,254 +229,6 @@ Specifically, you will learn the following:
 
 Like in the previous tutorial, this folder contains several lessons, each
 adding new features to IMP.  Do them in order.  Also, make sure you completed
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/3_lambda++/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
-
-## Part 3: Defining LAMBDA++
-
-Here you will learn how to define language constructs which abruptly change
-the execution control flow, and how to define language semantics following
-and environment/store style.  Specifically, you will learn the following:
-
-* How to define constructs like `callcc`, which allow you to take snapshots of
-  program executions and to go *back in time* at any moment.
-* How to define languages in an environment/store style.
-* Some basic notions about the use of closures and closure-like semantic
-  structures to save and restore execution environments.
-* Some basic intuitions about reusing existing semantics in new languages,
-  as well as some of the pitfalls in doing so.
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/4_imp++/README.md <==
-<!-- Copyright (c) 2010-2019 K Team. All Rights Reserved. -->
-
-## Part 4: Defining IMP++
-
-IMP++ extends IMP, which was discussed in Part 2 of this tutorial, with several
-new syntactic constructs.  Also, some existing syntax is generalized, which
-requires non-modular changes of the existing IMP semantics.  For example,
-global variable declarations become local declarations and can occur
-anywhere a statement can occur.  In this tutorial we will learn the following:
-
-* That (and how) existing syntax/semantics may change as a language evolves.
-* How to refine configurations as a language evolves.
-* How to define and use fresh elements of desired sorts.
-* How to tag syntactic constructs and rules, and how to use such tags
-  with the `superheat`/`supercool`/`transition` options of `kompile`.
-* How the `search` option of `krun` works.
-* How to stream cells holding semantic lists to the standard input/output,
-  and thus obtain interactive interpreters for the defined languages.
-* How to delete, save and restore cell contents.
-* How to add/delete cells dynamically.
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/5_types/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
-
-## Part 5: Defining Type Systems
-
-In this part of the tutorial we will show that defining type systems for
-languages is essentially no different from defining semantics.  The major
-difference is that programs and fragments of programs now rewrite to their
-types, instead of to concrete values.  In terms of K, we will learn how
-to use it for a certain particular but important kind of applications.
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_1/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
-
-### Syntax Modules and Basic K Commands
-
-[MOVIE [4'07"]](http://youtu.be/y5Tf1EZVj8E)
-
-Here we define our first K module, which contains the initial syntax of the
-LAMBDA language, and learn how to use the basic K commands.
-
-Let us create an empty working folder, and open a terminal window
-(to the left) and an editor window (to the right).  We will edit our K
-definition in the right window in a file called `lambda.k`, and will call
-the K tool commands in the left window.
-
-Let us start by defining a K module, containing the syntax of LAMBDA.
-
-K modules are introduced with the keywords `module` ... `endmodule`.
-
-The keyword `syntax` adds new productions to the syntax grammar, using a
-BNF-like notation.
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_2/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
-
-### Module Importing, Rules, Variables
-
-[MOVIE [4'03"]](http://youtu.be/NDXgYfHG6R4)
-
-We here learn how to include a predefined module (SUBSTITUTION), how to
-use it to define a K rule (the characteristic rule of lambda calculus),
-and how to make proper use of variables in rules.
-
-Let us continue our `lambda.k` definition started in the previous lesson.
-
-The `requires` keyword takes a `.k` file containing language features that
-are needed for the current definition, which can be found in the
-[k/include](/include/) folder.  Thus, the command
-
-    require "substitution.k"
-
-says that the subsequent definition of LAMBDA needs the generic substitution,
-which is predefined in file `substitution.k` under the folder
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_3/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
-
-### Evaluation Strategies using Strictness
-
-[MOVIE [2'20"]](http://youtu.be/aul1x6bd1YM)
-
-Here we learn how to use the K `strict` attribute to define desired evaluation
-strategies.  We will also learn how to tell K which terms are already
-evaluated, so it does not attempt to evaluate them anymore and treats them
-internally as results of computations.
-
-Recall from the previous lecture that the LAMBDA program
-`free-variable-capture.lambda` was stuck, because K was not given permission
-to evaluate the arguments of the lambda application construct.
-
-You can use the attribute `strict` to tell K that the corresponding construct
-has a strict evaluation strategy, that is, that its arguments need to be
-evaluated before the semantics of the construct applies.  The order of
-argument evaluation is purposely unspecified when using `strict`, and indeed
-the K tool allows us to detect all possible non-deterministic behaviors that
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_4/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
-
-### Generating Documentation; Latex Attributes
-
-[MOVIE [3'13"]](http://youtu.be/ULXA4e_6-DY)
-
-In this lesson we learn how to generate formatted documentation from K
-language definitions.  We also learn how to use Latex attributes to control
-the formatting of language constructs, particularly of ones which have a
-mathematical flavor and we want to display accordingly.
-
-To generate PDF documentation, all we have to do is to call the `kdoc` command
-in the folder where the kompiled definition is.  This command generates a
-`lambda.pdf` file, which contains the formatted K definition.
-
-Open this file using your favorite PDF reader.  The syntactic details are not
-shown in the generated PDF, because we typically want to focus on semantics at
-this stage.  The main notational difference between the original `.k` and the
-generated PDF is how rules are displayed.  In the PDF, the rule `left => right`
-is replaced by its representation in K (see papers on K), which is harder to
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_5/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
-
-### Adding Builtins; Side Conditions
-
-[MOVIE [4'52"]](http://youtu.be/T1aI04q3l9U)
-
-We have already added the builtin identifiers (sort `Id`) to LAMBDA expressions,
-but those had no operations on them.  In this lesson we add integers and
-Booleans to LAMBDA, and extend the builtin operations on them into
-corresponding operations on LAMBDA expressions.  We will also learn how to add
-side conditions to rules, to limit the number of instances where they can
-apply.
-
-The K tool provides several builtins, which are automatically included in all
-definitions.  These can be used in the languages that we define, typically by
-including them in the desired syntactic categories.  You can also define your
-own builtins in case the provided ones are not suitable for your language
-(e.g., the provided builtin integers and operations on them are arbitrary
-precision).
-
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_6/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
-
-### Selective Strictness; Anonymous Variables
-
-[MOVIE [2'14"]](http://youtu.be/IreP6DFPWdk)
-
-We here show how to define selective strictness of language constructs,
-that is, how to state that certain language constructs are strict only
-in some arguments.  We also show how to use anonymous variables.
-
-We next define a conditional `if` construct, which takes three arguments,
-evaluates only the first one, and then reduces to either the second or the
-third, depending on whether the first one evaluated to true or to false.
-
-K allows to define selective strictness using the same `strict` attribute,
-but passing it a list of numbers.  The numbers correspond to the arguments
-in which we want the defined construct to be strict.  In our case,
-
-    syntax Exp ::= "if" Exp "then" Exp "else" Exp   [strict(1)]
-
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_7/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
-
-### Derived Constructs, Extending Predefined Syntax
-
-[MOVIE [5'10"]](http://youtu.be/qZWiBaN7zrw)
-
-In this lesson we will learn how to define derived language constructs, that
-is, ones whose semantics is defined completely in terms of other language
-constructs.  We will also learn how to add new constructs to predefined
-syntactic categories.
-
-When defining a language, we often want certain language constructs to be
-defined in terms of other constructs.  For example, a let-binding construct
-of the form
-
-    let x = e in e'
-
-is nothing but syntactic sugar for
-
-    (lambda x . e') e
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_8/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
-
-### Multiple Binding Constructs
-
-[MOVIE [2'40"]](http://youtu.be/Ox4uXDpcY64)
-
-Here we learn how multiple language constructs that bind variables can
-coexist. We will also learn about or recall another famous binder besides
-`lambda`, namely `mu`, which can be used to elegantly define all kinds of
-interesting fixed-point constructs.
-
-The `mu` binder has the same syntax as lambda, except that it replaces
-`lambda` with `mu`.
-
-Since `mu` is a binder, in order for substitution to know how to deal with
-variable capture in the presence of `mu`, we have to tell it that `mu` is a
-binding construct, same like lambda.  We take advantage of being there and
-also add `mu` its desired latex attribute.
-
-The intuition for
-
-==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/1_lambda/lesson_9/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
-
-### A Complete and Documented K Definition
-
-[MOVIE [6'07"]](http://youtu.be/-pHgLqNMKac)
-
-In this lesson you will learn how to add formal comments to your K definition,
-in order to nicely document it.  The generated document can be then used for
-various purposes: to ease understanding the K definition, to publish it,
-to send it to others, etc.
-
-The K tool allows a literate programming style, where the executable
-language definition can be documented by means of annotations.  Some
-back-ends of the K tool, such as those enabled with the `--latex`, `--pdf` and
-the `--html` options to the `kompile` tool, know how to interpret such
-annotations.
-
-There are three types of comments, which we discuss next.
-
-#### Ordinary comments
 
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/2_imp/lesson_1/README.md <==
 <!-- Copyright (c) 2010-2019 K Team. All Rights Reserved. -->
@@ -399,8 +339,23 @@ This completes our second tutorial.  The next tutorials will teach us more
 features of the K framework, such as how to define languages with complex
 control constructs (like `callcc`), languages which are concurrent, and so on.
 
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/3_lambda++/README.md <==
+
+## Part 3: Defining LAMBDA++
+
+Here you will learn how to define language constructs which abruptly change
+the execution control flow, and how to define language semantics following
+and environment/store style.  Specifically, you will learn the following:
+
+* How to define constructs like `callcc`, which allow you to take snapshots of
+  program executions and to go *back in time* at any moment.
+* How to define languages in an environment/store style.
+* Some basic notions about the use of closures and closure-like semantic
+  structures to save and restore execution environments.
+* Some basic intuitions about reusing existing semantics in new languages,
+  as well as some of the pitfalls in doing so.
+
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/3_lambda++/lesson_1/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
 
 ### Abrupt Changes of Control
 
@@ -422,7 +377,6 @@ programming language that incorporated the `callcc` construct, although
 similar constructs have been recently included in many other languages in
 
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/3_lambda++/lesson_2/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
 
 ### Semantic (Non-Syntactic) Computation Items
 
@@ -510,7 +464,6 @@ it, and to recover it at invocation time:
     rule <k> (callcc V:Val => V cc(Rho,K)) ~> K </k> <env> Rho </env>
 
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/3_lambda++/lesson_6/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
 
 ### Wrapping Up and Documenting LAMBDA++
 
@@ -524,6 +477,28 @@ See the `lambda.k` file, which is self-explanatory.
 Part 3 of the tutorial is now complete.  Part 4 will teach you more features
 of the K framework, in particular how to exhaustively explore the behaviors
 of non-deterministic or concurrent programs.
+
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/4_imp++/README.md <==
+<!-- Copyright (c) 2010-2019 K Team. All Rights Reserved. -->
+
+## Part 4: Defining IMP++
+
+IMP++ extends IMP, which was discussed in Part 2 of this tutorial, with several
+new syntactic constructs.  Also, some existing syntax is generalized, which
+requires non-modular changes of the existing IMP semantics.  For example,
+global variable declarations become local declarations and can occur
+anywhere a statement can occur.  In this tutorial we will learn the following:
+
+* That (and how) existing syntax/semantics may change as a language evolves.
+* How to refine configurations as a language evolves.
+* How to define and use fresh elements of desired sorts.
+* How to tag syntactic constructs and rules, and how to use such tags
+  with the `superheat`/`supercool`/`transition` options of `kompile`.
+* How the `search` option of `krun` works.
+* How to stream cells holding semantic lists to the standard input/output,
+  and thus obtain interactive interpreters for the defined languages.
+* How to delete, save and restore cell contents.
+* How to add/delete cells dynamically.
 
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/4_imp++/lesson_1/README.md <==
 <!-- Copyright (c) 2010-2019 K Team. All Rights Reserved. -->
@@ -701,6 +676,16 @@ in the configuration layout, as you can see in the generated document.
 There is a detailed discussion at the end of the document about the
 `--transition` option of `kompile`, because that is important and we want
 
+==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/5_types/README.md <==
+
+## Part 5: Defining Type Systems
+
+In this part of the tutorial we will show that defining type systems for
+languages is essentially no different from defining semantics.  The major
+difference is that programs and fragments of programs now rewrite to their
+types, instead of to concrete values.  In terms of K, we will learn how
+to use it for a certain particular but important kind of applications.
+
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/5_types/lesson_1/README.md <==
 <!-- Copyright (c) 2014-2019 K Team. All Rights Reserved. -->
 
@@ -746,7 +731,6 @@ The syntax of all these will therefore change.
 
 
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/5_types/lesson_3/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
 
 ### Environment-Based Higher-Order Type Systems
 
@@ -790,7 +774,6 @@ that they must have the type `int` and the result of the addition is
 also an `int`, so the type of the entire expression is `int -> int -> int`.
 
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/5_types/lesson_5/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
 
 ### A Naive Environment-Based Type Inferencer
 
@@ -812,7 +795,6 @@ a linear complexity operation (the substitution) with a constant
 complexity one (the variable lookup).
 
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/5_types/lesson_6/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
 
 ### Parallel Type Checkers/Inferencers
 
@@ -834,7 +816,6 @@ inferencer that we chose here, the one in Lesson 5, each task will
 hold an expression to type together with a type environment (so it
 
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/5_types/lesson_7/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
 
 ### A Naive Substitution-based Polymorphic Type Inferencer
 
@@ -856,7 +837,6 @@ as follows:
     rule let X = E in E' => E'[E/X]  [macro]
 
 ==> /home/njr/co/github.com/kframework/k5/k-distribution/tutorial/1_k/5_types/lesson_8/README.md <==
-<!-- Copyright (c) 2012-2019 K Team. All Rights Reserved. -->
 
 ### A Naive Environment-based Polymorphic Type Inferencer
 
